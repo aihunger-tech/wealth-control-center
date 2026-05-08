@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.toml
+
+# Next.js build output
+.next/
+out/
+
+# Production build
+build/
+
+# Environment variables (CRITICAL: This keeps your API keys secret)
+.env*.local
+.env
+C:\Users\allhu\AppData\Local\npm-cache\logs\*
+
+# OS files
+.DS_Store
+Thumbs.db

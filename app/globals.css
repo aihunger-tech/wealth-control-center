@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+body {
+  background-color: #000000;
+  color: #e5e7eb;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Scrollbar for that "App" feel */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: #2d2d2d;
+  border-radius: 10px;
+}
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-scroll {
+  animation: scroll 30s linear infinite;
+}
