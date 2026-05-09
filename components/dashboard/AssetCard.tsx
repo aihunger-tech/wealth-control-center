@@ -1,40 +1,52 @@
 'use client';
 import { MarketAsset } from '@/types/finance';
-import { formatCurrency, formatPercent, getPriceColor } from '@/lib/utils';
-import { cn } from '@/lib/utils'; // <--- ADDED THIS IMPORT
-import { ArrowUpRight, ArrowDownRight, TrendingUp } from 'lucide-react';
+import { formatCurrency, formatPercent, getPriceColor, getTrendBg } from '@/lib/utils';
+import { cn } from '@/lib/utils'; 
+import { ArrowUpRight, ArrowDownRight, Zap } from 'lucide-react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 export default function AssetCard({ asset }: { asset: MarketAsset }) {
   const isUp = asset.changePercent >= 0;
 
   return (
-    <Link href={`/assets/${asset.id}`} className="block group">
-      <div className="bg-terminal-gray p-4 rounded-lg border border-terminal-lightGray hover:border-terminal-accent transition-all duration-300 cursor-pointer">
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <p className="text-gray-400 text-xs font-mono uppercase tracking-widest">{asset.type}</p>
-            <h3 className="text-lg font-bold text-white">{asset.symbol}</h3>
+    <motion.div
+      whileHover={{ y: -5 }}
+      transition={{ type: 'spring', stiffness: 300 }}
+    >
+      <Link href={`/assets/${asset.id}`} className="block group">
+        <div className={cn(
+          "p-5 rounded-2xl border backdrop-blur-md transition-all duration-300 cursor-pointer",
+          "bg-white/[0.03] border-white/10 hover:border-blue-500/50 hover:bg-white/[0.05] shadow-xl"
+        )}>
+          <div className="flex justify-between items-start mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-zinc-800 rounded-lg text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                <Zap size={16} fill="currentColor" />
+              </div>
+              <div>
+                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">{asset.type}</p>
+                <h3 className="text-lg font-black text-white leading-none">{asset.symbol}</h3>
+              </div>
+            </div>
+            <div className={cn("p-1.5 rounded-lg", getTrendBg(asset.changePercent))}>
+              {isUp ? <ArrowUpRight size={14} className="text-emerald-400" /> : <ArrowDownRight size={14} className="text-rose-400" />}
+            </div>
           </div>
-          <div className={cn("p-1 rounded-full", isUp ? "bg-emerald-500/10" : "bg-rose-500/10")}>
-            {isUp ? <ArrowUpRight size={16} className="text-terminal-up" /> : <ArrowDownRight size={16} className="text-terminal-down" />}
-          </div>
-        </div>
 
-        <div className="flex items-end justify-between">
-          <div>
-            <p className="text-2xl font-mono font-bold text-white">
+          <div className="space-y-1">
+            <p className="text-2xl font-black font-mono text-white tracking-tight">
               {formatCurrency(asset.currentPrice)}
             </p>
-            <p className={cn("text-xs font-mono", getPriceColor(asset.changePercent))}>
-              {formatPercent(asset.changePercent)} (24h)
-            </p>
-          </div>
-          <div className="text-gray-500 group-hover:text-terminal-accent transition-colors">
-            <TrendingUp size={20} />
+            <div className="flex items-center gap-2">
+              <span className={cn("text-xs font-bold px-2 py-0.5 rounded-md", getTrendBg(asset.changePercent))}>
+                <span className={getPriceColor(asset.changePercent)}>{formatPercent(asset.changePercent)}</span>
+              </span>
+              <span className="text-[10px] text-gray-600 font-medium uppercase">24H Change</span>
+            </div>
           </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </motion.div>
   );
 }
