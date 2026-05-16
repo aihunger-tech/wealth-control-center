@@ -1,14 +1,23 @@
 import { NextResponse } from 'next/server';
 import { fetchFinancialData } from '@/lib/api-client';
 
+export const revalidate = 300;
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const category = searchParams.get('category') || 'business';
   const apiKey = process.env.GNEWS_API_KEY;
 
-  const data = await fetchFinancialData(
-    `https://gnews.io/api/v4/top-headlines?category=${category}&lang=en&apikey=${apiKey}`
-  );
+  let data;
+  try {
+    data = await fetchFinancialData(
+      `https://gnews.io/api/v4/top-headlines?category=${category}&lang=en&apikey=${apiKey}`
+    );
+  } catch (err: any) {
+    // Extract status code from error message if possible
+    const statusCode = parseInt(err.message.split(': ')[1]) || 500;
+    return NextResponse.json({ error: 'Failed to fetch news' }, { status: statusCode });
+  }
 
   if (!data) return NextResponse.json({ error: 'Failed to fetch news' }, { status: 500 });
 

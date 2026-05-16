@@ -5,7 +5,7 @@ export async function fetchFinancialData(url: string, apiKey?: string) {
     };
 
     if (url.includes('coinmarketcap.com') && apiKey) {
-      headers['X-CMCK'] = apiKey;
+      headers['X-CMC_PRO_API_KEY'] = apiKey;
     }
 
     const response = await fetch(url, {

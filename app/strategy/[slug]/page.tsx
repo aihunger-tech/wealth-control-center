@@ -2,10 +2,12 @@
 import { STRATEGIES } from '@/constants/strategies';
 import { useParams } from 'next/navigation';
 import { cn, formatCurrency } from '@/lib/utils';
-import { ShieldCheck, TrendingUp, Zap, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, TrendingUp, Zap, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import AnalysisChart from '@/components/dashboard/AnalysisChart';
+import StrategyCalculator from '@/components/dashboard/StrategyCalculator';
 import { notFound } from 'next/navigation';
+import { adjustStrategyRisk } from '@/lib/risk-engine';
 
 export default function StrategyDetail() {
   const params = useParams();
@@ -13,12 +15,16 @@ export default function StrategyDetail() {
 
   if (!strategy) return notFound();
 
+  // In real app, this value comes from an API (e.g. VIX)
+  const currentMarketVolatility = 24.5;
+  const riskAnalysis = adjustStrategyRisk(strategy.riskLevel, currentMarketVolatility);
+
   // Prepare data for Chart.js Pie Chart
   const chartData = {
     labels: strategy.portfolioExample.map(item => item.asset),
     datasets: [{
       data: strategy.portfolioExample.map(item => parseInt(item.allocation)),
-      backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
+       backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
       borderWidth: 0,
     }],
   };
@@ -35,11 +41,12 @@ export default function StrategyDetail() {
           <header>
             <div className="flex items-center gap-3 mb-4">
               <span className={cn(
-                "text-[10px] font-bold uppercase px-2 py-1 rounded",
+                "text-[10px] font-bold uppercase px-2 py-1 rounded transition-colors duration-500",
+                riskAnalysis.isWarning ? "text-rose-400 bg-rose-400/10 border border-rose-400/20" : 
                 strategy.riskLevel === 'Low' ? "text-emerald-400 bg-emerald-400/10" : 
                 strategy.riskLevel === 'Medium' ? "text-yellow-400 bg-yellow-400/10" : "text-rose-400 bg-rose-400/10"
               )}>
-                {strategy.riskLevel} Risk Strategy
+                {riskAnalysis.adjustedRisk} Strategy
               </span>
               <span className="text-gray-500 text-xs font-mono">{strategy.timeHorizon}</span>
             </div>
@@ -48,6 +55,13 @@ export default function StrategyDetail() {
               {strategy.explanation}
             </p>
           </header>
+
+          {riskAnalysis.isWarning && (
+            <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center gap-4 text-rose-400 uppercase text-xs font-bold tracking-widest">
+              <AlertCircle size={18} strokeWidth={3} />
+              Market Volatility is affecting this playbook's risk profile.
+            </div>
+          )}
 
           <section className="bg-terminal-gray p-6 rounded-2xl border border-terminal-lightGray">
             <h3 className="text-white font-bold mb-4 flex items-center gap-2">
@@ -69,6 +83,8 @@ export default function StrategyDetail() {
               </li>
             </ul>
           </section>
+
+          <StrategyCalculator />
         </div>
 
         {/* Right Column: Visualization */}
@@ -98,3 +114,5 @@ export default function StrategyDetail() {
     </div>
   );
 }
+
+

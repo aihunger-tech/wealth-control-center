@@ -6,29 +6,39 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:es": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:es:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "chart.js": "latest",
     "clsx": "latest",
-    "framer-motion": "^12.38.0",
+    "framer-motion": "^11.0.0",
     "lightweight-charts": "latest",
     "lucide-react": "latest",
-    "next": "latest",
-    "react": "latest",
+    "next": "15.0.3",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "react-chartjs-2": "latest",
-    "react-dom": "latest",
     "swr": "latest",
-    "tailwind-merge": "latest"
+    "tailwind-merge": "latest",
+    "zustand": "latest"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.2.4",
+    "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "autoprefixer": "^10.5.0",
-    "postcss": "^8.5.14",
+    "autoprefixer": "latest",
+    "postcss": "latest",
     "tailwindcss": "latest",
-    "typescript": "latest"
+    "typescript": "latest",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "prettier": "^3.2.5"
   }
 }

@@ -3,13 +3,37 @@ import useSWR from 'swr';
 import { formatCurrency } from '@/lib/utils';
 import { Globe, Activity, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import StatCard from '@/components/ui/StatCard';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function GlobalStats() {
-  const { data, isLoading } = useSWR('/api/market/crypto?endpoint=global-quotes', fetcher);
+  const { data, error, isLoading, isValidating } = useSWR('/api/market/crypto?endpoint=global-quotes', fetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+  });
 
-  if (isLoading) {
+  if (error) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+        <div className="p-6 bg-zinc-900 rounded-2xl border border-white/5">
+          <p className="text-red-400 mb-2">Failed to load market data</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="btn-xs bg-blue-500 hover:bg-blue-600 text-white font-mono px-3 py-1 rounded"
+          >
+            Retry
+          </button>
+        </div>
+        {[1, 2].map((i) => (
+          <div key={i} className="h-24 bg-zinc-900 rounded-2xl border border-white/5" />
+        ))}
+      </div>
+    );
+  }
+
+  if (isLoading && !data) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[1, 2, 3].map((i) => (
@@ -18,48 +42,32 @@ export default function GlobalStats() {
       </div>
     );
   }
-  
-  if (!data) return null;
 
-  const stats = data.data || {};
+  const statsData = data?.data || {};
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
       <StatCard 
         label="Global Market Cap" 
-        value={formatCurrency(stats.active_cryptocurrencies?.market_cap_usd || 0)} 
+        value={formatCurrency(statsData.active_cryptocurrencies?.market_cap_usd || 0)} 
         icon={<Globe size={20} />} 
         color="text-blue-400"
+        borderColor="group-hover:border-blue-500/50"
       />
       <StatCard 
         label="24h Volume" 
-        value={formatCurrency(stats.active_cryptocurrencies?.total_volume_usd || 0)} 
+        value={formatCurrency(statsData.active_cryptocurrencies?.total_volume_usd || 0)} 
         icon={<Activity size={20} />} 
         color="text-emerald-400"
+        borderColor="group-hover:border-emerald-500/50"
       />
       <StatCard 
         label="Market Sentiment" 
         value="BULLISH" 
         icon={<Zap size={20} />} 
         color="text-purple-400"
+        borderColor="group-hover:border-purple-500/50"
       />
     </div>
-  );
-}
-
-function StatCard({ label, value, icon, color }: any) {
-  return (
-    <motion.div 
-      whileHover={{ scale: 1.02 }}
-      className="bg-white/[0.03] border border-white/10 p-5 rounded-2xl backdrop-blur-md flex items-center gap-4 transition-all hover:border-white/20"
-    >
-      <div className={`p-3 rounded-xl bg-black border border-white/10 ${color}`}>
-        {icon}
-      </div>
-      <div>
-        <p className="text-gray-500 text-[10px] uppercase font-black tracking-widest mb-1">{label}</p>
-        <p className="text-xl font-black font-mono text-white tracking-tight">{value}</p>
-      </div>
-    </motion.div>
   );
 }

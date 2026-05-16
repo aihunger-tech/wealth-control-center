@@ -1,23 +1,23 @@
 import { NextResponse } from 'next/server';
 import { fetchFinancialData } from '@/lib/api-client';
 
+export const revalidate = 60;
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const endpoint = searchParams.get('endpoint'); // 'global-quotes' or 'quotes/latest'
   const symbol = searchParams.get('symbol'); // e.g., 'BTC'
-  
+   
   const apiKey = process.env.CMC_API_KEY;
 
   try {
     if (endpoint === 'global-quotes') {
-      // Fetch Global Market Data (Market Cap, 24h Volume)
+      // Corrected Endpoint for Global Market Data
       const data = await fetchFinancialData(
-        `https://pro-api.coinmarketcap.com/v1/global-metrics/quotes-latest`, 
+        `https://pro-api.coinmarketcap.com/v1/global-metrics/quotes/latest`, 
         apiKey
       );
       
-      // Note: We pass apiKey in a custom header for CMC
-      // I will update the fetchFinancialData logic below to handle CMC headers
       return NextResponse.json(data);
     }
 

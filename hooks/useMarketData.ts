@@ -7,8 +7,8 @@ export function useMarketData(symbol: string, type: 'stock' | 'crypto') {
     `/api/market/quote?symbol=${symbol}&type=${type}`, 
     fetchFinancialData, 
     { 
-      refreshInterval: 60000, 
-      revalidateOnFocus: true 
+      refreshInterval: 300000, // 5 minutes
+      revalidateOnFocus: false, // rely on refreshInterval
     }
   );
 

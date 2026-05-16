@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { fetchFinancialData } from '@/lib/api-client';
 
+export const revalidate = 30;
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const symbol = searchParams.get('symbol');
